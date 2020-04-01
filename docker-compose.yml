@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    container_name: ${APP_NAME}_web
+    build:
+      context: ./docker/web
+    ports:
+      - 9000:80
+    volumes:
+      - ./:/var/www/app
+    depends_on:
+      - db
+    networks:
+    - laravel_network
+  db:
+    container_name: ${APP_NAME}_db
+    image: mysql:5.7
+    ports:
+      - 3307:3306
+    restart: always
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: project
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: adminPassword
+    networks:
+    - laravel_network
+  cache:
+    container_name: ${APP_NAME}_redis
+    image: redis:4.0.11
+    ports:
+      - 63791:6379
+    networks:
+    - laravel_network
+
+networks:
+  laravel_network:
+    driver: bridge
